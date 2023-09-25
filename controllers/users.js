@@ -34,7 +34,7 @@ module.exports.getUserById = (req, res) => {
       // send по дефолту имеет statuscode 200
     })
     .catch(() => {
-      res.status(500).send({ message: 'Пользователь с таким Id не найден' });
+      res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -48,6 +48,25 @@ module.exports.updateAvatar = (req, res) => {
       res.send({ data: user });
     }
   })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Некорректный запрос' });
+      }
+    });
+};
+
+module.exports.updateProfile = (req, res) => {
+  User.findByIdAndUpdate(req.user._id, {
+    name: req.body.name,
+    about: req.body.about,
+  })
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: 'Пользователь с таким Id не найден' });
+      }
+
+      return res.send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Некорректный запрос' });
