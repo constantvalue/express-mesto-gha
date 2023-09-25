@@ -14,10 +14,26 @@ module.exports.addUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
+      // ValidationError  -  это название ошибки. Получил её с помощью console.log
       if (err.message === 'ValidationError') {
 
       }
 
-      // ValidationError  -  это название ошибки
+
+    });
+};
+
+module.exports.getUserById = (req, res) => {
+  User
+    .findById(req.params.userId)
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: 'Пользователь с таким Id не найден' });
+        return;
+      }
+      res.send({ data: user });
+    })
+    .catch(() => {
+      res.status(404).send({ message: 'Пользователь с таким Id не найден' });
     });
 };
