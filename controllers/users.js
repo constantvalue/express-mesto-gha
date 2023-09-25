@@ -1,6 +1,5 @@
 const User = require('../models/user');
 
-// этот контроллер тупо копипаста из тренажера. Поменял только текст ошибки и переменную directors поменял на users.
 module.exports.getUsers = (req, res) => {
   User.find({})
   // res.send по умолчанию имеет status(200)
@@ -14,12 +13,12 @@ module.exports.addUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
-      // ValidationError  -  это название ошибки. Получил её с помощью console.log
-      if (err.message === 'ValidationError') {
-
+      // ValidationError  -  это имя ошибки. Получил её с помощью console.log
+      if (err.name === 'ValidationError') {
+        return res.status(400).send({ message: 'Некорректный запрос' });
       }
 
-
+      return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -29,11 +28,29 @@ module.exports.getUserById = (req, res) => {
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: 'Пользователь с таким Id не найден' });
-        return;
+      } else {
+        res.send({ data: user });
       }
-      res.send({ data: user });
+      // send по дефолту имеет statuscode 200
     })
     .catch(() => {
+      res.status(500).send({ message: 'Пользователь с таким Id не найден' });
+    });
+};
+
+module.exports.updateAvatar = (req, res) => {
+  User.findByIdAndUpdate(req.user._id, {
+    avatar: req.body.avatar,
+  }).then((user) => {
+    if (!user) {
       res.status(404).send({ message: 'Пользователь с таким Id не найден' });
+    } else {
+      res.send({ data: user });
+    }
+  })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Некорректный запрос' });
+      }
     });
 };
