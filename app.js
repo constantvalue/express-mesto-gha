@@ -23,7 +23,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// роуты для юзерконтроллера
 app.use('/users', require('./routes/users'));
+
+// роуты для кардконтроллера
+app.use('/cards', require('./routes/cards'));
 
 app.listen(PORT);
 
