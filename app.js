@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const express = require('express');
 
+const { NOT_FOUND } = require('./constants');
+
 const { PORT = 3000 } = process.env;
 
 const app = express();
@@ -30,7 +32,7 @@ app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
 // последний эндпоинт тест. Обработка несуществующего пути.
-app.use('/*', (req, res) => res.status(404).send({ message: 'Страница не существуею' }));
+app.use('/*', (req, res) => res.status(NOT_FOUND).send({ message: 'Страница не существуею' }));
 
 app.listen(PORT);
 
