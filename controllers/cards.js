@@ -1,17 +1,5 @@
 // ПОДСКАЗКИ ИЗ ТЕОРИИ ЯНДЕКСА (ИЗ БРИФА К ПР)
 
-// module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
-//   req.params.cardId,
-//   { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-//   { new: true },
-// )
-
-// module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
-//   req.params.cardId,
-//   { $pull: { likes: req.user._id } }, // убрать _id из массива
-//   { new: true },
-// )
-
 const Card = require('../models/card');
 
 module.exports.getCards = (req, res) => {
@@ -38,3 +26,40 @@ module.exports.addCard = (req, res) => {
       return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
+
+module.exports.deleteCard = (req, res) => {
+  Card.findByIdAndDelete(req.params.cardId)
+    .then((card) => {
+      if (!card) {
+        res.status(404).send({ message: 'Нет карточки с таким id' });
+      } else {
+        res.send(card);
+      }
+    });
+};
+
+module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
+  req.params.cardId,
+  { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+  { new: true },
+)
+  .then((card) => {
+    if (!card) {
+      res.status(404).send({ message: 'Нет карточки с таким id' });
+    } else {
+      res.send(card);
+    }
+  });
+
+module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
+  req.params.cardId,
+  { $pull: { likes: req.user._id } }, // убрать _id из массива
+  { new: true },
+)
+  .then((card) => {
+    if (!card) {
+      res.status(404).send({ message: 'Нет карточки с таким id' });
+    } else {
+      res.send(card);
+    }
+  });
