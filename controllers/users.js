@@ -41,7 +41,7 @@ module.exports.getUserById = (req, res) => {
 module.exports.updateAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id, {
     avatar: req.body.avatar,
-  }).then((user) => {
+  }, { new: true, runValidators: true }).then((user) => {
     if (!user) {
       res.status(404).send({ message: 'Пользователь с таким Id не найден' });
     } else {
@@ -50,8 +50,9 @@ module.exports.updateAvatar = (req, res) => {
   })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Некорректный запрос' });
+        return res.status(400).send({ message: 'Некорректный запрос' });
       }
+      return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -59,7 +60,7 @@ module.exports.updateProfile = (req, res) => {
   User.findByIdAndUpdate(req.user._id, {
     name: req.body.name,
     about: req.body.about,
-  })
+  }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         return res.status(404).send({ message: 'Пользователь с таким Id не найден' });
@@ -69,7 +70,9 @@ module.exports.updateProfile = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Некорректный запрос' });
+        return res.status(400).send({ message: 'Некорректный запрос' });
       }
+
+      return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
