@@ -1,5 +1,3 @@
-// ПОДСКАЗКИ ИЗ ТЕОРИИ ЯНДЕКСА (ИЗ БРИФА К ПР)
-
 const Card = require('../models/card');
 
 module.exports.getCards = (req, res) => {
@@ -35,6 +33,13 @@ module.exports.deleteCard = (req, res) => {
       } else {
         res.send(card);
       }
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Некорректный запрос' });
+      }
+
+      return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -45,10 +50,16 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
 )
   .then((card) => {
     if (!card) {
-      res.status(404).send({ message: 'Нет карточки с таким id' });
-    } else {
-      res.send(card);
+      return res.status(404).send({ message: 'Нет карточки с таким id' });
     }
+    return res.send(card);
+  })
+  .catch((err) => {
+    if (err.name === 'CastError') {
+      return res.status(400).send({ message: 'Некорректный запрос' });
+    }
+
+    return res.status(500).send({ message: 'Произошла ошибка' });
   });
 
 module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(

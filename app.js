@@ -29,6 +29,9 @@ app.use('/users', require('./routes/users'));
 // роуты для кардконтроллера
 app.use('/cards', require('./routes/cards'));
 
+// последний эндпоинт тест. Обработка несуществующего пути.
+app.use('/*', (req, res) => res.status(404).send({ message: 'Страница не существуею' }));
+
 app.listen(PORT);
 
 // 6511771048b240115a033721
