@@ -34,7 +34,8 @@ module.exports.getUserById = (req, res) => {
       // send по дефолту имеет statuscode 200
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      // if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Некорректный запрос' });
       }
       return res.status(500).send({ message: 'Произошла ошибка' });
