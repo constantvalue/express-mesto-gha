@@ -28,6 +28,7 @@ module.exports.addCard = (req, res, next) => {
       // ValidationError  -  это имя ошибки. Получил её с помощью console.log
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Некорректный запрос'));
+        return;
       }
 
       next(err);
@@ -35,7 +36,7 @@ module.exports.addCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndDelete(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Нет карточки с таким id');
@@ -43,11 +44,13 @@ module.exports.deleteCard = (req, res, next) => {
       } else if (card.owner.toString() !== req.user._id) {
         throw new ForbiddenError('Эта карточка вам не принадлежит');
       }
-      res.send(card);
+      // card.remove().then(res.send(card));
+      return Card.findByIdAndRemove(req.params.cardId).then(() => res.send({ data: card }));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Некорректный запрос'));
+        return;
       }
 
       next(err);
@@ -68,6 +71,7 @@ module.exports.likeCard = (req, res, next) => Card.findByIdAndUpdate(
   .catch((err) => {
     if (err.name === 'CastError') {
       next(new BadRequestError('Некорректный запрос'));
+      return;
     }
 
     next(err);
@@ -87,6 +91,7 @@ module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
   .catch((err) => {
     if (err.name === 'CastError') {
       next(new BadRequestError('Некорректный запрос'));
+      return;
     }
 
     next(err);

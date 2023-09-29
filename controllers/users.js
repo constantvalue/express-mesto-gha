@@ -37,7 +37,7 @@ module.exports.addUser = (req, res, next) => {
     }))
     .then((user) => res.status(CREATED)
       .send({
-      // res.send({ data: user })) - такой подход вызывает ошибки при проверке эндпоинтов.
+      // res.send({ data: user })) - такой подход вызывает ошибки при проверке эндпоинтов.g
       // поэтому с помощью деструктуризации отправляю все кроме пароля.
         email: user.email, name: user.name, about: user.about, avatar: user.avatar,
 
@@ -46,7 +46,8 @@ module.exports.addUser = (req, res, next) => {
       // ValidationError  -  это имя ошибки. Получил её с помощью console.log
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Некорректный запрос'));
-      } else if (err.code === 11000) {
+        return;
+      } if (err.code === 11000) {
         next(new ConflictError('Пользователь с таким email уже зарегестрирован'));
       }
 
@@ -67,6 +68,7 @@ module.exports.getUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Некорректный запрос'));
+        return;
       }
       next(err);
     });
@@ -85,6 +87,7 @@ module.exports.updateAvatar = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Некорректный запрос'));
+        return;
       }
       next(err);
     });
@@ -105,6 +108,7 @@ module.exports.updateProfile = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Некорректный запрос'));
+        return;
       }
 
       next(err);
