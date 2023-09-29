@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
@@ -89,6 +90,25 @@ module.exports.updateProfile = (req, res, next) => {
         next(new BadRequestError('Некорректный запрос'));
       }
 
+      next(err);
+    });
+};
+
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      // создадим токен (срок действия по брифу - 7 дней)
+      const token = jwt.sign({ _id: user._id }, 'top_secret', { expiresIn: '7d' });
+
+      // вернём токен
+      res.send({ token });
+    })
+    .catch((err) => {
+      // res
+      //   .status(401)
+      //   .send({ message: err.message });
       next(err);
     });
 };
