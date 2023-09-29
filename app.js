@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const express = require('express');
+const { addUser } = require('./controllers/users');
 
 const { NOT_FOUND } = require('./constants');
 
@@ -16,14 +17,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
-// хардкод мидлвейр из брифа
-app.use((req, res, next) => {
-  req.user = {
-    _id: '6511771048b240115a033721', // вставьте сюда _id созданного в предыдущем пункте пользователя
-  };
-
-  next();
-});
+// app.post('/signin', login);
+app.post('/signup', addUser);
 
 // роуты для юзерконтроллера
 app.use('/users', require('./routes/users'));
