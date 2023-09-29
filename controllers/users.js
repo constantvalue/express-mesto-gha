@@ -30,6 +30,7 @@ module.exports.addUser = (req, res, next) => {
   const {
     name, about, avatar, password, email,
   } = req.body;
+
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name, about, avatar, password: hash, email,
@@ -37,8 +38,9 @@ module.exports.addUser = (req, res, next) => {
     .then((user) => res.status(CREATED)
       .send({
       // res.send({ data: user })) - такой подход вызывает ошибки при проверке эндпоинтов.
-      // email: user.email, _id: user._id, name: user.name, about: user.about, avatar: user.avatar,
-        data: user, password,
+      // поэтому с помощью деструктуризации отправляю все кроме пароля.
+        email: user.email, name: user.name, about: user.about, avatar: user.avatar,
+
       }))
     .catch((err) => {
       // ValidationError  -  это имя ошибки. Получил её с помощью console.log
