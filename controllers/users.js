@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
@@ -15,9 +16,16 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.addUser = (req, res, next) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.status(CREATED).send(user))
+  const {
+    name, about, avatar, password, email,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, password: hash, email,
+    }))
+    .then((user) => res.status(CREATED).send({
+      email: user.email, _id: user._id, name: user.name, about: user.about, avatar: user.avatar,
+    }))
     .catch((err) => {
       // ValidationError  -  это имя ошибки. Получил её с помощью console.log
       if (err.name === 'ValidationError') {
