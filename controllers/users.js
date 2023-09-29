@@ -1,4 +1,6 @@
 const User = require('../models/user');
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
 
 const {
   SERVER_FAILURE, BAD_REQUEST, NOT_FOUND, CREATED,
@@ -26,23 +28,23 @@ module.exports.addUser = (req, res) => {
     });
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   User
     .findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        res.status(NOT_FOUND).send({ message: 'Пользователь с таким Id не найден' });
+        throw new NotFoundError('Нет пользователя с таким id');
       } else {
         res.send({ data: user });
       }
       // send по дефолту имеет statuscode 200
     })
     .catch((err) => {
-      // if (err.name === 'ValidationError') {
+
       if (err.name === 'CastError') {
-        return res.status(BAD_REQUEST).send({ message: 'Некорректный запрос' });
+        throw new BadRequestError('Некорректный запрос');
       }
-      return res.status(SERVER_FAILURE).send({ message: 'Произошла ошибка' });
+      next(err);
     });
 };
 

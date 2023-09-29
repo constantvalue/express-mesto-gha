@@ -34,6 +34,21 @@ app.use('/cards', require('./routes/cards'));
 // последний эндпоинт тест. Обработка несуществующего пути.
 app.use('/*', (req, res) => res.status(NOT_FOUND).send({ message: 'Страница не существуею' }));
 
+app.use((err, req, res, next) => {
+  // если у ошибки нет статуса, выставляем 500
+  const { statusCode = 500, message } = err;
+
+  res
+    .status(statusCode)
+    .send({
+      // проверяем статус и выставляем сообщение в зависимости от него
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
+  next();
+});
+
 app.listen(PORT);
 
 // 6511771048b240115a033721
