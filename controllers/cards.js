@@ -1,6 +1,7 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 const {
   CREATED,
@@ -38,9 +39,11 @@ module.exports.deleteCard = (req, res, next) => {
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Нет карточки с таким id');
-      } else {
-        res.send(card);
+        // преобразуем объект в строковое представление
+      } else if (card.owner.toString() !== req.user._id) {
+        throw new ForbiddenError('Эта карточка вам не принадлежит');
       }
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
