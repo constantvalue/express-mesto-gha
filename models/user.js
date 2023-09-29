@@ -3,8 +3,6 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const UnathorisedError = require('../errors/UnathorisedError');
 
-
-
 const userSchema = new mongoose.Schema({
 
   name: {
@@ -50,8 +48,8 @@ const userSchema = new mongoose.Schema({
 
 });
 
-//взято из теории по спринту.
-//переделал только обработку ошибок
+// взято из теории по спринту.
+// переделал только обработку ошибок
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {

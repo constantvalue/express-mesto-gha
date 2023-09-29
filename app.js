@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const express = require('express');
 const { addUser, login } = require('./controllers/users');
-const auth = require('./middlewares/auth')
+const auth = require('./middlewares/auth');
 
 const { NOT_FOUND } = require('./constants');
 
@@ -18,20 +18,11 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '65169ba63ea2df2dc5f7194d',
-  };
-
-  next();
-});
-
-
-//эти роуты не требуют защиты авторизацией.
+// эти роуты не требуют защиты авторизацией.
 app.post('/signin', login);
 app.post('/signup', addUser);
 
-//все что идет после этого мидлвара - будет защищено авторизацией
+// все что идет после этого мидлвара - будет защищено авторизацией
 app.use(auth);
 
 // роуты для юзерконтроллера

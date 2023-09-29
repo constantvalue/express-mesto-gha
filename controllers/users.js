@@ -8,10 +8,20 @@ const {
   CREATED,
 } = require('../constants');
 
+// получаем всех юзеров
 module.exports.getUsers = (req, res, next) => {
   User.find({})
   // res.send по умолчанию имеет status(200)
     .then((users) => res.send({ data: users }))
+    // ловим ошибки если сервер пятисотит
+    .catch(next);
+};
+
+// получаем только себя
+module.exports.getUsersMe = (req, res, next) => {
+  User.findById(req.user._id)
+  // res.send по умолчанию имеет status(200)
+    .then((user) => res.send({ data: user }))
     // ловим ошибки если сервер пятисотит
     .catch(next);
 };
