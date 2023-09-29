@@ -4,8 +4,7 @@ const express = require('express');
 const { celebrate, errors, Joi } = require('celebrate');
 const { addUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
-
-const regEx = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
+const { regEx } = require('./constants');
 
 const { NOT_FOUND } = require('./constants');
 

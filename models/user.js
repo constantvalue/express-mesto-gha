@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const UnathorisedError = require('../errors/UnathorisedError');
+const { regEx } = require('../constants');
 
 const userSchema = new mongoose.Schema({
 
@@ -25,7 +26,7 @@ const userSchema = new mongoose.Schema({
     validate: {
 
       // https://uibakery.io/regex-library/url
-      validator: (v) => /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/.test(v),
+      validator: (v) => regEx.test(v),
 
       message: 'Это не ссылка',
     },
