@@ -53,6 +53,8 @@ app.use('/cards', require('./routes/cards'));
 // последний эндпоинт тест. Обработка несуществующего пути.
 app.use('/*', (req, res) => res.status(NOT_FOUND).send({ message: 'Страница не существуею' }));
 
+// обрабатываем ошибки которые генерирует celebrate.
+// Этот метод вернет тело ошибки с указанием причины ошибки валидации.
 app.use(errors());
 
 app.use((err, req, res, next) => {
