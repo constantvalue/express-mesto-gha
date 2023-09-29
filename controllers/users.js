@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
-
+const ConflictError = require('../errors/ConflictError');
 const {
   CREATED,
 } = require('../constants');
@@ -34,13 +34,18 @@ module.exports.addUser = (req, res, next) => {
     .then((hash) => User.create({
       name, about, avatar, password: hash, email,
     }))
-    .then((user) => res.status(CREATED).send({
-      email: user.email, _id: user._id, name: user.name, about: user.about, avatar: user.avatar,
-    }))
+    .then((user) => res.status(CREATED)
+      .send({
+      // res.send({ data: user })) - такой подход вызывает ошибки при проверке эндпоинтов.
+      // email: user.email, _id: user._id, name: user.name, about: user.about, avatar: user.avatar,
+        data: user, password,
+      }))
     .catch((err) => {
       // ValidationError  -  это имя ошибки. Получил её с помощью console.log
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Некорректный запрос'));
+      } else if (err.code === 11000) {
+        next(new ConflictError('Пользователь с таким email уже зарегестрирован'));
       }
 
       next(err);
