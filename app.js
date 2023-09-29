@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const express = require('express');
+const { celebrate, errors, Joi } = require('celebrate');
 const { addUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+
+const regEx = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
 
 const { NOT_FOUND } = require('./constants');
 
@@ -19,8 +22,24 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 // эти роуты не требуют защиты авторизацией.
-app.post('/signin', login);
-app.post('/signup', addUser);
+
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(6),
+    avatar: Joi.string().pattern(regEx),
+  }),
+}), addUser);
+
+// app.post('/signin', login);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(6),
+  }),
+}), login);
 
 // все что идет после этого мидлвара - будет защищено авторизацией
 app.use(auth);
@@ -33,6 +52,8 @@ app.use('/cards', require('./routes/cards'));
 
 // последний эндпоинт тест. Обработка несуществующего пути.
 app.use('/*', (req, res) => res.status(NOT_FOUND).send({ message: 'Страница не существуею' }));
+
+app.use(errors());
 
 app.use((err, req, res, next) => {
   // если у ошибки нет статуса, выставляем 500
